@@ -1,0 +1,50 @@
+siblings: Suite repositories {
+  style.stroke-dash: 3
+  ext: "odin-sdk-extension\nmake repo"
+  yggr: "yggr\nmake repo"
+}
+
+ci: "CI bundle\n*.flatpak artifact" {
+  shape: cloud
+  style.stroke-dash: 3
+}
+
+archive: amberlinux-flatpak {
+  out: "out/  (ostree, archive-z2)" {
+    shape: package
+    objects: "objects/**\ncontent-addressed"
+    refs: "refs/ · summary · summary.idx"
+  }
+  key: "GPG key\n~/.gnupg" {
+    shape: hexagon
+    style.stroke-dash: 3
+  }
+  key -> out.refs: "sign: one signature per commit,\nsummary + keyring together" {style.stroke-dash: 3}
+}
+
+siblings -> archive.out: "make add-suite  (pull-local)" {style.bold: true}
+ci -> archive.out: "make import BUNDLE=…" {style.stroke-dash: 3}
+
+gates: "make stage" {
+  style.fill: "#fff4e0"
+  buildpaths: "check-buildpaths.sh\nno ref names this machine"
+  fresh: "verify-fresh.sh\nevery ref == sibling's build"
+  client: "verify-client.sh\nfresh flatpak client installs,\nGPG verification on"
+  buildpaths -> fresh -> client
+}
+
+archive.out -> gates.buildpaths: gates the upload
+
+cdn: "flatpak.amberlinux.org  (TLS enforced: http 301s, HSTS)" {
+  shape: cloud
+  assets: "summary · refs/ · keyring ·\nflatpakrepo — static assets, byte-exact"
+  r2: "objects/** · deltas/**\nR2 bucket via worker" {shape: cylinder}
+}
+
+gates.client -> cdn: "make deploy\n(r2-sync + wrangler + live verify)" {style.bold: true}
+
+client: "User's machine" {
+  remote: "flatpak remote-add …\namberlinux.flatpakrepo carries the key"
+}
+
+cdn -> client.remote: "flatpak install"

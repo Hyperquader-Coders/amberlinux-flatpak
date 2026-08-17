@@ -1,0 +1,5 @@
+# A package archive is for package managers, not crawlers. Indexing it costs
+# R2 egress for content no search result can usefully point at, and without
+# this the zone's managed robots.txt applies instead. Matches amberlinux-apt.
+User-agent: *
+Disallow: /

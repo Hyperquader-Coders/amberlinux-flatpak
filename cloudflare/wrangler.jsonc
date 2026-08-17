@@ -1,0 +1,23 @@
+// flatpak.amberlinux.org — see docs/DEPLOY.md. The ostree summary, config and
+// refs are served as static assets, byte-exact (html_handling "none" is the
+// point); objects/** and deltas/** exceed the 25 MiB asset cap and are served
+// from R2 by the worker.
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "amberlinux-flatpak",
+  "compatibility_date": "2026-06-21",
+  "main": "worker.js",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "../out",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "run_worker_first": true,
+  },
+  "r2_buckets": [
+    { "binding": "OBJECTS", "bucket_name": "amberlinux-flatpak-objects" },
+  ],
+  "routes": [
+    { "pattern": "flatpak.amberlinux.org", "custom_domain": true },
+  ],
+}

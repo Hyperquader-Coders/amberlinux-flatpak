@@ -1,0 +1,20 @@
+#!/bin/sh
+# Reject commits whose staged shell files fail shellcheck. Same threshold as
+# `make lint`, so the hook cannot disagree with the gate.
+command -v shellcheck >/dev/null || exit 0
+
+files=$(git diff --cached --name-only --diff-filter=ACMR | while read -r f; do
+	[ -f "$f" ] || continue
+	case "$f" in
+	*.sh | *.bash) echo "$f" ;;
+	*) head -1 "$f" 2>/dev/null | grep -q '^#!.*sh' && echo "$f" ;;
+	esac
+done)
+
+[ -z "$files" ] && exit 0
+
+if ! printf '%s\n' "$files" | xargs -d '\n' -r shellcheck --severity=warning; then
+	echo ""
+	echo "pre-commit: shellcheck failed — fix the above, or commit with --no-verify to skip."
+	exit 1
+fi

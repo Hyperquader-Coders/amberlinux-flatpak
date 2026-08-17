@@ -1,0 +1,28 @@
+# Every response pins TLS: the worker 301s http to https, and HSTS keeps a
+# client from ever asking over plain HTTP again. The worker sets the same
+# header on what it serves from R2.
+/*
+  Strict-Transport-Security: max-age=31536000
+
+# The summary is what a client reads to learn which refs exist and at which
+# commits. A cached summary against fresh objects is the mismatch that makes
+# flatpak report a ref it cannot then resolve.
+/summary
+  Cache-Control: no-cache
+/summary.sig
+  Cache-Control: no-cache
+# The summary index is what a modern client (flatpak >= 1.9) fetches first, and
+# it is rewritten on every publish. The sub-summaries under /summaries/ are
+# digest-named and safe to cache by default; the index is not.
+/summary.idx
+  Cache-Control: no-cache
+/summary.idx.sig
+  Cache-Control: no-cache
+/config
+  Cache-Control: no-cache
+/refs/*
+  Cache-Control: no-cache
+/amberlinux-flatpak.gpg
+  Cache-Control: public, max-age=3600
+/amberlinux.flatpakrepo
+  Cache-Control: public, max-age=3600
