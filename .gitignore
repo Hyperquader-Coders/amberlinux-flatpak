@@ -1,0 +1,17 @@
+# The built ostree repo in build/repo; dist/ for finished bundles; out/ only
+# for what a program writes while it runs. .r2-synced is the upload bookkeeping.
+/build/
+/dist/
+/out/
+.r2-synced
+
+# Agent files are local and are not shared.
+.claude/
+.mcp.json
+
+# Claude config dirs, if a session ever materialises one here.
+.claude-amber/
+.credentials.json
+
+# wrangler writes the Cloudflare account id and name here.
+.wrangler/

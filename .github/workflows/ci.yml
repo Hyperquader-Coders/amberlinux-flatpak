@@ -1,0 +1,31 @@
+# `make lint`: every fingerprint a document prints is the one GPG_KEY signs with, the
+# diagram matches its source, no workflow deploys, and the shell scripts pass shellcheck.
+# `make ci` is not run: its `verify` needs the ostree repo under build/repo, which is
+# assembled and signed on the machine holding the key. That key is not in CI and never
+# will be, so nothing here signs or publishes. The apt archive sibling is private and is
+# not checked out; the lint says so and skips its keys-differ check.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends shellcheck
+
+      - name: make lint
+        run: make lint

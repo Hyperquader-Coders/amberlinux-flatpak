@@ -1,0 +1,15 @@
+# objects/** and deltas/** are served from R2 by the worker, not as static
+# assets — they are the half that exceeds the 25 MiB asset cap.
+objects/
+deltas/
+
+# ostree's own working state. Not part of what a client fetches, and `tmp`
+# in particular can hold partial writes. The uncompressed cache appears when
+# anything checks out from the repo and grows to the size of the whole tree.
+tmp/
+state/
+extensions/
+uncompressed-objects-cache/
+
+# ostree's lock file. Internal bookkeeping, not part of what a client fetches.
+.lock
