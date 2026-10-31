@@ -1,0 +1,34 @@
+# `make ci`, which is `make lint` and `make test`: every fingerprint a document prints is the
+# one the Makefile's GPG_KEY line names, the diagram matches its source, no workflow deploys, the
+# shell scripts pass shellcheck, and the tooling (add-suite, import, check-buildpaths, sign,
+# check-repo, check-fresh, check-client) works on a throwaway archive signed by a throwaway key in a
+# temporary GNUPGHOME.
+# `make stage` and `make check` are not run: they need the archive's secret key and build/repo,
+# which live on the machine that publishes and never in CI, so nothing here signs with the
+# archive key or publishes. The apt archive sibling is private and is not checked out; the lint
+# says so and skips its keys-differ check.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      # The packages are the Makefile's DEPS list.
+      - name: system packages
+        run: sudo apt-get update && make init-packages APT_FLAGS=-y
+
+      # make ci: make lint, then make test.
+      - name: make ci
+        run: make ci

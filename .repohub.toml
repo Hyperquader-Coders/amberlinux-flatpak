@@ -1,0 +1,3 @@
+# RepositoryHub checks this repository against its template, packaging and licence
+# (repositoryhub docs/HYGIENE.md).
+license = "BSD-3-Clause"
